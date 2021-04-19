@@ -1,0 +1,214 @@
+#+title: SPARQL
+
+* Queries
+
+More resources on [[https://www.w3.org/TR/sparql11-query/#QueryForms][SPARQL 1.1 Query Language]].
+
+** Union
+
+#+begin_src
+PREFIX dc10:  <http://purl.org/dc/elements/1.0/>
+PREFIX dc11:  <http://purl.org/dc/elements/1.1/>
+
+SELECT ?title ?author
+WHERE  { { ?book dc10:title ?title .  ?book dc10:creator ?author }
+         UNION
+         { ?book dc11:title ?title .  ?book dc11:creator ?author }
+       }
+#+end_src
+** NOT EXISTS
+
+#+begin_src
+PREFIX  rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  foaf:   <http://xmlns.com/foaf/0.1/>
+
+SELECT ?person
+WHERE
+{
+    ?person rdf:type  foaf:Person .
+    FILTER NOT EXISTS { ?person foaf:name ?name }
+}
+#+end_src
+
+** Removing duplicates
+
+#+begin_src
+{   ?x foaf:mbox <mailto:alice@example> .
+    ?x foaf:knows/foaf:knows ?y .
+    FILTER ( ?x != ?y )
+    ?y foaf:name ?name
+}
+#+end_src
+
+
+** Find all the people who know someone ?x knows.
+
+#+begin_src
+{
+    ?x foaf:knows/^foaf:knows ?y .
+    FILTER(?x != ?y)
+}
+#+end_src
+
+Equivalent to
+
+#+begin_src
+{
+    ?x foaf:knows ?gen1 .
+    ?y foaf:knows ?gen1 .
+    FILTER(?x != ?y)
+}
+#+end_src
+
+* Query path & Aggregation
+
+#+begin_src
+PREFIX :   <http://example/>
+  SELECT (sum(?x) AS ?total)
+  {
+    :order :item/:price ?x
+  }
+#+end_src
+
+* BIND
+
+#+begin_src
+PREFIX  dc:  <http://purl.org/dc/elements/1.1/>
+PREFIX  ns:  <http://example.org/ns#>
+
+SELECT  ?title ?price
+{  ?x ns:price ?p .
+   ?x ns:discount ?discount
+   BIND (?p*(1-?discount) AS ?price)
+   FILTER(?price < 20)
+   ?x dc:title ?title .
+}
+#+end_src
+
+* VALUES
+
+Data:
+
+#+begin_src
+@prefix dc:   <http://purl.org/dc/elements/1.1/> .
+@prefix :     <http://example.org/book/> .
+@prefix ns:   <http://example.org/ns#> .
+
+:book1  dc:title  "SPARQL Tutorial" .
+:book1  ns:price  42 .
+:book2  dc:title  "The Semantic Web" .
+:book2  ns:price  23 .
+#+end_src
+
+Query:
+
+#+begin_src
+PREFIX dc:   <http://purl.org/dc/elements/1.1/>
+PREFIX :     <http://example.org/book/>
+PREFIX ns:   <http://example.org/ns#>
+
+SELECT ?book ?title ?price
+{
+   VALUES ?book { :book1 :book3 }
+   ?book dc:title ?title ;
+         ns:price ?price .
+}
+#+end_src
+
+* Aggregates
+
+Aggregates defined in version 1.1 of SPARQL are:
+
+- COUNT
+- SUM
+- MIN/MAX/AVG
+- GROUP_CONCAT
+- SAMPLE
+
+#+begin_src
+PREFIX : <http://books.example/>
+SELECT (SUM(?lprice) AS ?totalPrice)
+WHERE {
+  ?org :affiliates ?auth .
+  ?auth :writesBook ?book .
+  ?book :price ?lprice .
+}
+GROUP BY ?org
+HAVING (SUM(?lprice) > 10)
+#+end_src
+
+* Subqueries
+
+First evaluates the inner query, then the outer query:
+
+#+begin_src
+PREFIX : <http://people.example/>
+PREFIX : <http://people.example/>
+SELECT ?y ?minName
+WHERE {
+  :alice :knows ?y .
+  {
+    SELECT ?y (MIN(?name) AS ?minName)
+    WHERE {
+      ?y :name ?name .
+    } GROUP BY ?y
+  }
+}
+
+#+end_src
+* Query Forms
+
+** SELECT
+
+#+begin_src
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+SELECT ?nameX ?nameY ?nickY
+WHERE
+  { ?x foaf:knows ?y ;
+       foaf:name ?nameX .
+    ?y foaf:name ?nameY .
+    OPTIONAL { ?y foaf:nick ?nickY }
+  }
+#+end_src
+
+** CONSTRUCT
+
+Data:
+
+#+begin_src
+@prefix  foaf:  <http://xmlns.com/foaf/0.1/> .
+_:a    foaf:name   "Alice" .
+_:a    foaf:mbox   <mailto:alice@example.org> .
+#+end_src
+
+Query:
+
+#+begin_src
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+PREFIX vcard:   <http://www.w3.org/2001/vcard-rdf/3.0#>
+CONSTRUCT   { <http://example.org/person#Alice> vcard:FN ?name }
+WHERE       { ?x foaf:name ?name }
+#+end_src
+
+Result:
+
+#+begin_src
+@prefix vcard: <http://www.w3.org/2001/vcard-rdf/3.0#> .
+<http://example.org/person#Alice> vcard:FN "Alice" .
+#+end_src
+
+** ASK
+
+#+begin_src
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+ASK  { ?x foaf:name  "Alice" ;
+          foaf:mbox  <mailto:alice@work.example> }
+#+end_src
+
+** DESCRIBE
+
+#+begin_src
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+DESCRIBE ?x
+WHERE    { ?x foaf:mbox <mailto:alice@org> }
+#+end_src
