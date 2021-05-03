@@ -1,0 +1,47 @@
+#+options: toc:1
+#+author: Arnau Abella
+#+title: OD: Description Logics
+
+* [[pdf:09-Ontology-Languages.pdf::14][Exercise II]]
+
+** Inheritance/Subtyping
+
+- $Manager \subseteq Employee$
+- $AreaManager \subseteq Manager$
+- $TopManager \subseteq Manager$
+- $(AreaManager \cup TopManager) \equiv Manager$
+- $(AreaManager \cap TopManager) \equiv \emptyset$
+- $manages \subseteq worksFor$
+
+** Relationship
+
+- $\exists boss \subseteq Employee$
+- $\exists boss^- \subseteq Manager$
+- $Employee \subseteq \ \geq1boss \ \land \leq1boss$
+- $Manager \subseteq \exists boss^-$
+
+- $\exists worksFor \subseteq Employee$
+- $\exists worksFor^- \subseteq Project$
+- $Employee \subseteq \exists worksFor$
+- $Project \subseteq \ \geq 3 worksFor^-$
+
+- $\exists manages \subseteq TopManager$
+- $\exists manages^- \subseteq Project$
+- $TopManager \subseteq \ \geq1manages \ \land \leq1manages$
+- $Project \subseteq \ \geq1manages^- \ \land \leq1manages^-$
+
+** Attributes
+*** Employee's attributes
+
+- $\exists empCode \subseteq Employee$
+- $\exists empCode^- \subseteq Integer$
+- $Employee \subseteq \ \geq1empCode \ \land \leq1empCode$
+- $\exists salary \subseteq Employee$
+- $\exists salary^- \subseteq Integer$
+- $Employee \subseteq \ \geq1salary \ \land \leq1salary$
+
+*** Project's attributes
+
+- $\exists projectName \subseteq Project$
+- $\exists projectName^- \subseteq String$
+- $Project \subseteq \ \geq1projectName \ \land \leq1projectName$

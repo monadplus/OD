@@ -1,29 +1,34 @@
-[[pdf:09-Ontology-Languages.pdf::9][Exercise 1]]
+#+options: toc:1
+#+author: Arnau Abella
+#+title: OD: Description Logics
 
-* $\forall hasChild.(Doctor \cup Lawyer)$
+
+* [[pdf:09-Ontology-Languages.pdf::9][Exercise I]]
+
+** $\forall hasChild.(Doctor \cup Lawyer)$
 
 $\{a | \forall b. (a, b) \in \text{ hasChild } \to b \in (Doctor \cup Lawyer)\}$
 
-* $\exists hasChild.Doctor$
+** $\exists hasChild.Doctor$
 
 $\{a | \exists b. (a, b) \in \text{ hasChild } \land b \in Doctor\}$
 
-* $\neg (Doctor \cup Lawyer)$
+** $\neg (Doctor \cup Lawyer)$
 
 $\Delta^I \setminus (Doctor \cup Lawyer)$
 
-* $(\ge 2hasChild) \cap (\leq 1sibling)$
+** $(\ge 2hasChild) \cap (\leq 1sibling)$
 
 $\{a | \#\{b | (a, b) \in \text{ hasChild }\} \geq 2 \} \cap \{a | \#\{b | (a, b) \in \text{ sibling }\} \leq 1\}$
 
-* $(\ge 2hasChild.Doctor)$
+** $(\ge 2hasChild.Doctor)$
 
 $\{a | \#\{b | (a, b) \in \text{ hasChild } \land b \in Doctor \} \geq 2 \}$
 
-* $\forall hasChild^-.Doctor$
+** $\forall hasChild^-.Doctor$
 
 $\{a | \forall b. (a, b) \in \{ (a,b) | (b,a) \in \text{ hasChild }\} \to b \in Doctor\}$
 
-* $\exists hasChild^*.Doctor$
+** $\exists hasChild^*.Doctor$
 
 $\{a | \exists b. (a, b) \in (\text{ hasChild })^* \to b \in Doctor\}$
