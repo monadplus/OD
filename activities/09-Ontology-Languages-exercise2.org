@@ -15,15 +15,17 @@
 
 ** Relationship
 
+Notice the multiplicity is the other way around (have a look at the def of $\leq k.R$)
+
 - $\exists boss \subseteq Employee$
 - $\exists boss^- \subseteq Manager$
-- $Employee \subseteq \ \geq1boss \ \land \leq1boss$
-- $Manager \subseteq \exists boss^-$
+- $Employee \subseteq \exists boss^-$
+- $Manager \subseteq \ \geq1boss^- \ \land \leq1boss^-$
 
 - $\exists worksFor \subseteq Employee$
 - $\exists worksFor^- \subseteq Project$
-- $Employee \subseteq \exists worksFor$
-- $Project \subseteq \ \geq 3 worksFor^-$
+- $Employee \subseteq \geq 3 worksFor$
+- $Project \subseteq \ \exists worksFor^-$
 
 - $\exists manages \subseteq TopManager$
 - $\exists manages^- \subseteq Project$
