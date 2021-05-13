@@ -32,7 +32,12 @@ WHERE
 
 ** Removing duplicates
 
+All people who know someone who knows Alice.
+
 #+begin_src
+PREFIX  foaf:   <http://xmlns.com/foaf/0.1/>
+
+SELECT ?name
 {   ?x foaf:mbox <mailto:alice@example> .
     ?x foaf:knows/foaf:knows ?y .
     FILTER ( ?x != ?y )
@@ -40,8 +45,7 @@ WHERE
 }
 #+end_src
 
-
-** Find all the people who know someone ?x knows.
+All people who know each other.
 
 #+begin_src
 {

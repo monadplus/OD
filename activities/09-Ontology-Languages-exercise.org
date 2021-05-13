@@ -27,7 +27,7 @@ $\{a | \#\{b | (a, b) \in \text{ hasChild } \land b \in Doctor \} \geq 2 \}$
 
 ** $\forall hasChild^-.Doctor$
 
-$\{a | \forall b. (a, b) \in \{ (a,b) | (b,a) \in \text{ hasChild }\} \to b \in Doctor\}$
+$\{a | \forall b. (b, a) \in \text{ hasChild } \to b \in Doctor\}$
 
 ** $\exists hasChild^*.Doctor$
 

@@ -9,41 +9,22 @@
 - $Manager \subseteq Employee$
 - $AreaManager \subseteq Manager$
 - $TopManager \subseteq Manager$
-- $(AreaManager \cup TopManager) \equiv Manager$
-- $(AreaManager \cap TopManager) \equiv \emptyset$
+- $(AreaManager \cup TopManager) \equiv Manager$ or $Manager \subseteq AreaManager \cup TopManager$
+- $(AreaManager \cap TopManager) \equiv \emptyset$ or $AreaManager \subseteq \neg TopManager$
 - $manages \subseteq worksFor$
 
 ** Relationship
 
-Notice the multiplicity is the other way around (have a look at the def of $\leq k.R$)
-
-- $\exists boss \subseteq Employee$
-- $\exists boss^- \subseteq Manager$
-- $Employee \subseteq \exists boss^-$
-- $Manager \subseteq \ \geq1boss^- \ \land \leq1boss^-$
+You read the cardinality as an Employee works in 3 or more projects.
 
 - $\exists worksFor \subseteq Employee$
 - $\exists worksFor^- \subseteq Project$
 - $Employee \subseteq \geq 3 worksFor$
 - $Project \subseteq \ \exists worksFor^-$
-
-- $\exists manages \subseteq TopManager$
-- $\exists manages^- \subseteq Project$
-- $TopManager \subseteq \ \geq1manages \ \land \leq1manages$
-- $Project \subseteq \ \geq1manages^- \ \land \leq1manages^-$
+- ...
 
 ** Attributes
-*** Employee's attributes
 
-- $\exists empCode \subseteq Employee$
-- $\exists empCode^- \subseteq Integer$
-- $Employee \subseteq \ \geq1empCode \ \land \leq1empCode$
-- $\exists salary \subseteq Employee$
+- $Employee \subseteq \exists salary$
 - $\exists salary^- \subseteq Integer$
-- $Employee \subseteq \ \geq1salary \ \land \leq1salary$
-
-*** Project's attributes
-
-- $\exists projectName \subseteq Project$
-- $\exists projectName^- \subseteq String$
-- $Project \subseteq \ \geq1projectName \ \land \leq1projectName$
+- ...

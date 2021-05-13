@@ -1,0 +1,154 @@
+* RDF
+
+Limited:
+    - can't express n-ary relationships
+    - No distinction between schema and data
+    - No constraints
+
+ex:uri1 <rdf:type> ex:uri2
+
+uri1 is instance of uri2 (class)
+
+RDF-start allows embedded triplets:
+    employee :claims << :employee :jobTitle "Assistant" >>
+
+* RDF Schema (RDFS)
+
+Adds schema and constraints over RDF.
+
+#+begin_src
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+#+end_src
+
+Classes (Human, Lecturer, etc):
+
+| Name          | Description                | Instance of                       |
+|---------------+----------------------------+-----------------------------------|
+| rdfs:Resource | Superclass of everything   | rdfs:Class                        |
+| rdfs:Class    | Class of all classes       | rdfs:Class                        |
+| rdfs:Literal  | Class of string, int, etc. | rdfs:Class, subclass of :Resource |
+| rdf:Property  | Class of rdfs properties   | rdfs:Class                        |
+| rdfs:Datatype |                            |                                   |
+
+Properties (Lectures, ResponsibleFor, etc):
+
+| Name               | Description                  | Instance of  |
+|--------------------+------------------------------+--------------|
+| rdfs:range         | codomain                     | rdf:Property |
+| rdfs:domain        | domain                       | rdf:Property |
+| rdf:type           | Resource instance of class   | rdf:Property |
+| rdfs:subClassOf    |                              | rdf:Property |
+| rdfs:subPropertyOf |                              | rdf:Property |
+| rdfs:label         | human-readable resource name | rdf:Property |
+| rdfs:comment       |                              | rdf:Property |
+
+Example:
+
+Schema:
+- :Lecturer rdfs:subClassOf :Human
+- :ResponsibleFor rdfs:subPropertyOf :Lectures
+- :Lectures rdfs:domain :Human
+- :Lectures rdfs:range :Course
+
+Instance:
+- :Oscar rdf:type :Lecturer
+- :OpenData rdf:type :Course
+- :Oscar ResponsibleFor :OpenData
+
+Inferred knowledge:
+- :Oscar rdf:type :Human
+- :Oscar :Lectures :OpenData
+
+** Reasoning
+
+- Core type inference.
+- Domain-specific inference.
+
+Example:
+
+#+begin_src
+                      :Oscar rdf:type :Lecturer
+                      :Lecturer rdfs:subClassOf :Human
+                      --------------------------------
+Core type inference   :Lecturer rdf:type :Class
+                      :Human    rdf:type :Class
+                      --------------------------------
+Domain-specific inf.  :Oscar rdf:type :Human
+#+end_src
+
+- For a complete example see [[pdf:/home/arnau/master/OD/activities/RDFS-modeling-exercise-SOLUTION.pdf::2][RDFS Modeling Exercise]]
+
+* Description Logics DL
+
+OWL is based on DL.
+
+Decidable subsets of firs-order logic:
+- Datalog
+- Description Logic (e.g. OWL)
+
+TBox : schema (e.g. Father \equiv Human \cap Male \cap \exists child)
+ABox : instances (e.g. Father(John), child(John, Mary))
+
+- Individual
+- Atomic concept (e.g. Father)
+- Role (e.g. child)
+
+$AL family$
+- Atomic concept
+- Atomic role
+- Atomic negation
+- C \cap D
+- Exists role \exists R
+- Value restriction
+- bottom
+
+$ALU family$: C \cup D
+$ALE family$: \exists R.C
+...
+
+Reasoning:
+- Concept satisfiability: does C admit a model? (C != empty set)
+- Concept subsumption: does C \subseteq D for all interpretations ?
+
+Example:
+- Woman \equiv Person \cap Female
+- Man \equiv Person \cap \neg Female
+- Mother \equiv Woman \cap \exists hasChild.Person
+
+Recall families are related with complexity
+- AL, ALN \subseteq PTIME
+- ALU, ALUN \subseteq NP-complete
+- ...
+
+*  OWL DL
+
+- subClassOf: C \subseteq D
+- equivalentClass: C \equiv D
+- disjointWith: C \subseteq \neg D
+- sameIndividualAs: { President Bush } \equiv { G.W. Bush}
+- differentFrom: { Obama } \equiv { G.W. Bush}
+- subPropertyOf: P \subseteq Q
+- equivalentProperty: P \equiv Q
+- inverseOf: P \equiv P^-
+- transitiveProperty: ancestor+ \subseteq ancestor
+- functionalProperty: T \subseteq (\leq 1 hasChild)
+- inverseFunctionalProperty: T \subseteq (\leq 1 hasChild^-)
+- intersectionOf
+- unionOf
+- complementOf
+- oneOf
+- allValuesFrom
+- someValuesFrom
+- maxCardinality
+- minCardinality
+
+Constraint as reification
+
+
+#+BEGIN_SRC
+_:a rdfs:subClassOf owl:Restriction
+_:a owl:onProperty :Leads
+_:a owl:allValuesFrom :Professor
+
+:Department rdfs:subClassOf _:a   equivalent to  :Department \subseteq \forall :Leads.:Professor
+#+END_SRC
