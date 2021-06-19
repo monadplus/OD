@@ -1,0 +1,323 @@
+* Cypher
+
+[[https://neo4j.com/docs/cypher-manual/current/][The Neo4j Cypher Manual v4.3 - Neo4j Cypher Manual]]
+
+** Table of Content
+
+DML:
+- MATCH
+- OPTIONAL MATCH
+- RETURN
+- WITH
+- UNWIND
+- WHERE
+- ORDER BY
+- SKIP
+- LIMIT
+- UNION
+- MERGE
+- USE
+
+DDL:
+- CREATE
+- DELETE
+- REMOVE
+- SET
+- FOREACH
+- CALL
+- LOAD CSV
+- SHOW
+
+Predicate functions:
+- all()
+- any()
+- exists()
+- isEmpty()
+- none()
+- single()
+
+Scalar functions:
+- coalesce(): first non-null value
+- endNode()
+- head()
+- id()
+- last()
+- length()
+- ...
+
+Aggregate functions:
+- avg()
+- collect()
+- count()
+- max()
+- min()
+- percentileCont()
+- percentileDisc()
+- stDev()
+- stDevP()
+- sum()
+
+List functions
+Mathematical functions
+String functions
+Temporal functions
+Spatial functions
+
+** Predicate Functions
+
+#+begin_src c
+MATCH p = (a)-[*1..3]->(b)
+WHERE
+  a.name = 'Alice'
+  AND b.name = 'Daniel'
+  AND all(x IN nodes(p) WHERE x.age > 30)
+RETURN p
+#+end_src
+
+** Aggregate functions
+
+#+begin_src c
+MATCH (n:Person)
+RETURN avg(n.age)
+
+MATCH (n {name: 'A'})-->(x)
+RETURN labels(n), n.age, count(*)
+
+MATCH (me:Person)-->(friend:Person)-->(friend_of_friend:Person)
+WHERE me.name = 'A'
+RETURN count(DISTINCT friend_of_friend), count(friend_of_friend)
+#+end_src
+
+** MATCH
+
+#+begin_src c
+MATCH (:Person {name: 'Oliver Stone'})-->(movie)
+RETURN movie.title
+
+MATCH (wallstreet {title: 'Wall Street'})<-[:ACTED_IN|:DIRECTED]-(person)
+RETURN person.name
+
+MATCH (charlie {name: 'Charlie Sheen'})-[:ACTED_IN]->(movie)<-[:DIRECTED]-(director)
+RETURN movie.title, director.name
+
+MATCH (charlie {name: 'Charlie Sheen'})-[:ACTED_IN*1..3]-(movie:Movie)
+RETURN movie.title
+
+MATCH (wallstreet:Movie {title: 'Wall Street'})-[*0..1]-(x)
+RETURN x
+
+MATCH
+  (martin:Person {name: 'Martin Sheen'}),
+  (oliver:Person {name: 'Oliver Stone'}),
+  p = shortestPath((martin)-[*..15]-(oliver))
+RETURN p
+#+end_src
+
+** OPTIONAL MATCH
+
+#+begin_src c
+MATCH (a:Movie {title: 'Wall Street'})
+OPTIONAL MATCH (a)-[r:ACTS_IN]->()
+RETURN a.title, r
+#+end_src
+
+** RETURN
+
+#+begin_src c
+MATCH (a {name: 'A'})
+RETURN a.age AS SomethingTotallyDifferent
+
+MATCH (a {name: 'A'})
+RETURN a.age > 30, "I'm a literal", (a)-->()
+
+MATCH (a {name: 'A'})-->(b)
+RETURN DISTINCT b
+#+end_src
+
+** WITH
+
+#+begin_src c
+// The name of the person connected to 'David' with the at least more than one outgoing relationship will be returned by the query
+MATCH (david {name: 'David'})--(otherPerson)-->()
+WITH otherPerson, count(*) AS foaf
+WHERE foaf > 1
+RETURN otherPerson.name
+
+MATCH (n)
+WITH n
+ORDER BY n.name DESC
+LIMIT 3
+RETURN collect(n.name)
+
+MATCH (n {name: 'Anders'})--(m)
+WITH m
+ORDER BY m.name DESC
+LIMIT 1
+MATCH (m)--(o)
+RETURN o.name
+#+end_src
+
+** UNWIND
+
+#+begin_src c
+WITH [1, 1, 2, 2] AS coll
+UNWIND coll AS x
+WITH DISTINCT x
+RETURN collect(x) AS setOfVals
+
+WITH [[1, 2], [3, 4], 5] AS nested
+UNWIND nested AS x
+UNWIND x AS y
+RETURN y
+
+WITH [] AS list
+UNWIND
+  CASE
+    WHEN list = [] THEN [null]
+    ELSE list
+  END AS emptylist
+RETURN emptylist
+#+end_src
+
+** WHERE
+
+#+begin_src c
+MATCH (n:Person)
+WHERE n.name = 'Peter'
+  XOR (n.age < 30 AND n.name = 'Timothy')
+  OR NOT (n.name = 'Timothy' OR n.name = 'Peter')
+RETURN n.name, n.age
+
+MATCH (n)
+WHERE n:Swedish
+RETURN n.name, n.age
+
+WITH 'AGE' AS propname
+MATCH (n:Person)
+WHERE n[toLower(propname)] < 30
+RETURN n.name, n.age
+
+MATCH (n:Person)
+WHERE n.belt IS NOT NULL
+RETURN n.name, n.belt
+
+MATCH (n:Person)
+WHERE n.name STARTS WITH 'Pet'
+RETURN n.name, n.age
+
+MATCH (n:Person)
+WHERE n.name =~ 'Tim.*'
+RETURN n.name, n.age
+
+MATCH (n:Person)-[r]->()
+WHERE n.name='Andy' AND type(r) =~ 'K.*'
+RETURN type(r), r.since
+
+MATCH
+  (timothy:Person {name: 'Timothy'}),
+  (other:Person)
+WHERE other.name IN ['Andy', 'Peter'] AND (other)-->(timothy)
+RETURN other.name, other.age
+
+MATCH (person:Person)
+WHERE EXISTS {
+  MATCH (person)-[:HAS_DOG]->(:Dog)
+}
+RETURN person.name AS name
+#+end_src
+
+** ORDER BY
+
+#+begin_src c
+MATCH (n)
+RETURN n.name, n.age
+ORDER BY n.age, n.name DESC
+
+MATCH (n)
+WITH n ORDER BY n.age
+RETURN collect(n.name) AS names
+#+end_src
+
+** SKIP/LIMIT
+
+#+begin_src c
+MATCH (n)
+RETURN n.name
+ORDER BY n.name
+SKIP 3
+LIMIT 3
+#+end_src
+
+** UNION
+
+#+begin_src c
+MATCH (n:Actor)
+RETURN n.name AS name
+UNION ALL
+MATCH (n:Movie)
+RETURN n.title AS name
+#+end_src
+
+** MERGE
+
+MERGE either matches existing nodes and binds them, or it creates new data and binds that.
+
+#+begin_src c
+MERGE (keanu:Person {name: 'Keanu Reeves'})
+ON CREATE
+  SET keanu.created = timestamp()
+RETURN keanu.name, keanu.created
+
+MERGE (person:Person)
+ON MATCH
+  SET person.found = true
+RETURN person.name, person.found
+#+end_src
+
+** CREATE/DELETE
+
+#+begin_src c
+MATCH
+  (charlie:Person {name: 'Charlie Sheen'}),
+  (martin:Person {name: 'Martin Sheen'})
+CREATE (charlie)-[:X {blocked: false}]->(:UNBLOCKED)<-[:X {blocked: false}]-(martin)
+CREATE (charlie)-[:X {blocked: true}]->(:BLOCKED)<-[:X {blocked: false}]-(martin)
+
+MATCH
+  (a:Person),
+  (b:Person)
+WHERE a.name = 'A' AND b.name = 'B'
+CREATE (a)-[r:RELTYPE {name: a.name + '<->' + b.name}]->(b)
+RETURN type(r), r.name
+#+end_src
+
+** SET
+
+#+begin_src c
+MATCH
+  (at {name: 'Andy'}),
+  (pn {name: 'Peter'})
+SET at = pn
+RETURN at.name, at.age, at.hungry, pn.name, pn.age
+
+// the case returns null so no node is updated.
+MATCH (n {name: 'Andy'})
+SET (CASE WHEN n.age = 55 THEN n END).worksIn = 'Malmo'
+RETURN n.name, n.worksIn
+
+MATCH (n {name: 'Andy'})
+SET n.name = null
+RETURN n.name, n.age
+#+end_src
+
+** REMOVE
+
+#+begin_src c
+MATCH (a {name: 'Andy'})
+REMOVE a.age
+RETURN a.name, a.age
+
+MATCH (n {name: 'Peter'})
+REMOVE n:German
+RETURN n.name, labels(n)
+#+end_src

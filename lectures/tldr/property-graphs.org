@@ -1,0 +1,86 @@
+* Graph Data Models and Applications
+
+Schema information is embedded together with data.
+
+Schemaless: semantics are fixed by edges/nodes labels.
+
+Allow to represent any other data model: nodes and edges are enough
+
+Two families of graph models:
+- Property Graphs
+  + Not predefined semantics
+  + Closed-world assumption (i.e. complete data)
+  + Generate data silos
+  + Algebraic operations based on graph structures
+- Knowledge Graphs
+  + Open-word assumptions
+  + Facilitate data sharing and linking
+  + Two families:
+    - RDF(S)
+    - Description Logics
+
+* Property graphs
+
+No standard
+
+Nodes and edges labelled and may have a set of properties (key-value pairs).
+Directed edges.
+Multi-graphs.
+
+Example: n_1: Person ---------------> n_2: Movie
+                      e_1: acts_in
+                     --------------->
+                      e_2: directs
+Graph operations:
+- Content-based queries: get a node, get a value of a node, aggregations.
+- Topological queries: graph algorithms e.g.
+  + Adjacency (e.g. "find all friends of a person")
+  + Reachability: find a walk between two nodes. (e.g. friend of a friend, flight connections.)
+    - Label-constrained Reachability
+  + Pattern Matching (graph isomorphism): given a pattern graph P and a property graph G, find all sub-graphs of G isomorphic/homomorphic to P.
+    A pattern graph (bgp) is a property graph where variables can appear in place of any constant.
+    Types of pattern matching:
+      - Homomorphism: multiples variables in the bgp can map to the same term in the graph.
+      - Isomorphism: match function must be injective (1-1 mapping).
+    Both are NP-complete problems.
+    Graph simulation and bi-simulation are relaxed forms and polynomial time!
+  + Graph Metrics
+    - Graph node order
+    - min/max degree in the graph
+    - length of a path
+    - graph diameter
+    - ...
+
+Graphs algorithms:
+  + Centrality:
+    - Page Rank: PR(i) - d*Sum PR(j)/L(j). Iterative algorithm. Start by assigning same weight to all nodes.
+    - Betweenness Centrality: number shortest path through the vertex / number short path
+    - Closeness Centrality: inverse of distance to the other vertexs.
+  + Community Detection:
+    - Triangle Counting: 3-clique
+    - Louvain Method: complex algorithm, see wikipedia.
+    - Strongly Connected Components: maximal set of connected components (there is a path for each pair of nodes).
+  + Similarity:
+    - Node Similarity: Jaccard Metric J(A,B) = |A && B| `div` |A U B|
+  + Path Finding Algorithm:
+    - MST
+    - Dijkstra's Shortest Path
+
+* Graph Query Languages
+
+Query graph by (extended) pattern matching.
+Semantics depend on graph database (i.e. homo vs. iso)
+Distinguish between:
+- Adjacency queries
+- Mix of pattern matching and reachability. Extends pattern matching with regex.
+  Regular path queries (RPQ)/Navigational graph patterns (NGP)
+- Complex graph patterns
+
+Cypher:
+- created by neo4j
+- standard de facto
+- Semantics: no repeated-edge isomorphism
+
+More info at [[file:CYPHER.org][Cypher]].
+
+* Graph Databases
