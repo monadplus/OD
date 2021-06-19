@@ -1,13 +1,33 @@
+#+title: Knowledge Graphs
+
+Semi-structured data models.
+
+Metadata as first-class citizen.
+
+Linked data (Property Graphs do not provide means to define semantic pointers)
+
 * RDF
 
+The most basic **ontology** language.
+Triples maps to FOL.
+Syntax: XML/Turtle.
+Triple example:  =ex:uri1 <rdf:type> ex:uri2=
 Limited:
-    - can't express n-ary relationships
-    - No distinction between schema and data
-    - No constraints
+- Can't express n-ary relationships (reification is needed).
+- No distinction between schema and data.
+- No constraints.
+- Reusing vocabularies is optional.
 
-ex:uri1 <rdf:type> ex:uri2
+Blank nodes:
+- No URI (cannot be referenced).
+- They are used in OWL and other specific cases.
 
-uri1 is instance of uri2 (class)
+Popular RDF vocabularies (RDF graphs):
+- SKOS: https://www.w3.org/TR/skos-reference/
+- FOAF: http://xmlns.com/foaf/spec/
+- SDMX: https://sdmx.org/
+- QB: https://www.w3.org/TR/vocab-data-cube/
+- GeoNames: http://www.geonames.org/ontology/documentation.html
 
 RDF-start allows embedded triplets:
     employee :claims << :employee :jobTitle "Assistant" >>
@@ -78,13 +98,20 @@ Domain-specific inf.  :Oscar rdf:type :Human
 
 - For a complete example see [[pdf:/home/arnau/master/OD/activities/RDFS-modeling-exercise-SOLUTION.pdf::2][RDFS Modeling Exercise]]
 
+
+* SPARQL
+
+De facto language to query RDF.
+
+[[file:SPARQL.org][SPARQL notes]].
+
 * Description Logics DL
 
 OWL is based on DL.
 
-Decidable subsets of firs-order logic:
+Decidable subsets of FOL:
 - Datalog
-- Description Logic (e.g. OWL)
+- Description Logics (e.g. OWL)
 
 TBox : schema (e.g. Father \equiv Human \cap Male \cap \exists child)
 ABox : instances (e.g. Father(John), child(John, Mary))
@@ -110,7 +137,7 @@ Reasoning:
 - Concept satisfiability: does C admit a model? (C != empty set)
 - Concept subsumption: does C \subseteq D for all interpretations ?
 
-Example:
+Example of TBOX:
 - Woman \equiv Person \cap Female
 - Man \equiv Person \cap \neg Female
 - Mother \equiv Woman \cap \exists hasChild.Person
@@ -142,8 +169,7 @@ Recall families are related with complexity
 - maxCardinality
 - minCardinality
 
-Constraint as reification
-
+Constraint as reification:
 
 #+BEGIN_SRC
 _:a rdfs:subClassOf owl:Restriction
@@ -152,3 +178,46 @@ _:a owl:allValuesFrom :Professor
 
 :Department rdfs:subClassOf _:a   equivalent to  :Department \subseteq \forall :Leads.:Professor
 #+END_SRC
+
+* Tripletstore
+
+Two main alternatives to store knowledge graphs:
+- Relational implementation (triplestore)
+- Graph native representation (graph databases)
+
+** Triplestores
+
+Store knowledge graphs.
+SPARQL engine to query the graphs.
+A layer providing basic semantic services (graphical exploratory, etc).
+
+Storage in relation databases: a single table with 3 columns (Subject, Predicate, Object).
+Since this approach does not scale up, they use a **quadtriples**: <graph name, subject, predicate, object>.
+For each distinct graph name, they use a table <Subject, Predicate, Object> (horizontal partitioning.)
+
+IOQA (Index-Only Query Answering):
+- 7 combinations of indexes: S,O,P,SO,SP,OP,SOP.
+
+Query Engine:
+- SPARQL de facto for RDF(S) and OWL.
+- Reasoners as a plugin.
+
+SPARQL:
+- Closed-world assumption (no inference).
+- Two regimes: RDFS and OWL2 DL/QL.
+- Optimization: materializes all inference, queries work under closed-world assumptions.
+
+Reasoners:
+- Open-world assumptions.
+- Perform ontology reasoning.
+
+Shape Constraining Language (SHACL): conformance checking.
+
+Tools:
+- Triplestores: GraphDB, Apache Rya, Amazon Neptune, ...
+- Processing frameworks: Apache Jena, RDF4j, ...
+- Reasoners: Ontop, Hermit, ...
+
+* Graph-based Virtual Data Integration
+
+See slides [[file:~/master/OD/lectures/12-Graph-based-Data-Integration.pdf][Graph-based Virtual Data Integration]]  (hard to make notes).

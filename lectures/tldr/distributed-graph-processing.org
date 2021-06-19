@@ -1,1 +1,55 @@
 * Distributed Graph Processing
+
+Distributed graph processing requires data exposed as:
+- Set of vertices
+- Set of edges
+
+For example, Apache Titan works as a key-value incidence list and works on top of HBase/Cassandra.
+
+** Thinking Like a Vertex (TLAV) frameworks
+
+Message Passing Interface (MPI) adapted for graph processing: vertices pass messages to adjacent vertices.
+
+Models:
+- Bulk Synchronous Parallel (BSP) computing model (supersteps = synchronization barriers)
+- Asynchronous computing model: hard to get it right (deadlocks, data races, etc)
+
+Vertices execute vertex kernel, they send messages to adjacent vertices and repeat.
+
+Pregel is the most famous TLAV framework.
+- Input: list of nodes, directed edges and messages
+- Processing:
+  + Modify its state
+  + Send Messages to other vertices
+  + Mutate the topology
+- Voting halt
+- Output: set of values explicitly output  by the vertices.
+
+GraphX: subproject of Apache Spark. Provices distributed algorithms: PageRank, SCC, etc.
+
+Message Passing Optimizations:
+- Sender-side combiner: combine message before send to node(machine).
+- Receiver-side combiner:
+- Receiver-side scatter: If A wants to send messages to B,C,D and B,C,D are in the same network/machine. A sends all the messages together and on B,C,D the message is scattered and distributed to each machine.
+
+Shared-memory optimization to avoid message passing overhead.
+Works for centralized graph processing.
+Consistency is guaranteed by mutual exclusion
+
+Partitioning of graphs is an open problem.
+
+BSP-TLAV are computationally complete? Not yet proved.
+
+** TLAV vs Pregel
+
+Theoretical TLAV:
+- Apply (vertex program): applied on vertex v at superstep S.
+  + First iteration: all vertices receives a pre-defined message and apply it.
+  + Next iterations: only invoked on vertices that receives messages.
+- Scatter: send messages to adjacent vertices to be received on superstep S+1.
+- Gather: receives messages send to node v from previous superstep and apply the function. The function must be commutative and associative.
+
+The order is merge > apply > scatter > barrier
+
+Pregel:
+- **Triplet view** can be accessed during scatter to get information about the destination node. This allows us to not send a message if the message will not change the state of the destination node.

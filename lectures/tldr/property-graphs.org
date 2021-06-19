@@ -84,3 +84,52 @@ Cypher:
 More info at [[file:CYPHER.org][Cypher]].
 
 * Graph Databases
+
+A graph database:
+- Store and persist graphs
+- Process
+
+For example, neo4j allows to store and process graph data.
+
+Implementations:
+- Adjacency List (dense)
+- Incidence List: nodes contains list of edges incident to the node.
+- Adjacency Matrix (sparse)
+- Incidence Matrix
+
+#+begin_src
+      e_1 ... e_m
+n_1 |            |
+... |            |
+n_n |            |
+#+end_src
+
+Neo4j implementation(linked list)
+- Nodes:
+  + One file for all nodes (in memory)
+  + 9 bytes per node
+    - 1: metadata
+    - 2-5: id first relationship
+    - 6-9: id first property
+  + Lookup O(1)
+- Relationships:
+  + One file
+  + Fixed size record 32 bytes
+    - Metadata
+    - id starting node
+    - id end node
+    - id type
+    - ids of the previous and following relationships of the starting/ending node
+    - id first property
+- Properties:
+  + One file
+  + Fixed size record 21 bytes
+    - Metadata (belongs to edge or node)
+    - id node/edge
+    - ids of the previous/following properties of the node/edge
+    - id property name
+    - id property value
+- Property name-value dict:
+  + One file
+
+As an example, see [[file:~/master/OD/lectures/04-Graph-Databases-NEO4J-EXAMPLE.png][neo4j implementation exercise]]
