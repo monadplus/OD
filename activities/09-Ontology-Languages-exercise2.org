@@ -20,7 +20,7 @@ You read the cardinality as an Employee works in 3 or more projects.
 - $\exists worksFor \subseteq Employee$
 - $\exists worksFor^- \subseteq Project$
 - $Employee \subseteq \geq 3 worksFor$
-- $Project \subseteq \ \exists worksFor^-$
+- $Project \subseteq \exists worksFor^-$
 - ...
 
 ** Attributes

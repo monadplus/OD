@@ -4,6 +4,18 @@
 
 More resources on [[https://www.w3.org/TR/sparql11-query/#QueryForms][SPARQL 1.1 Query Language]].
 
+** Optional
+
+#+begin_src
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dc:   <http://purl.org/dc/elements/1.1/>
+PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>
+SELECT ?givenName
+ WHERE { ?x foaf:givenName  ?givenName .
+         OPTIONAL { ?x dc:date ?date } .
+         FILTER ( bound(?date) ) }
+#+end_src
+
 ** Union
 
 #+begin_src

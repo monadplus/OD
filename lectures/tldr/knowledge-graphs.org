@@ -149,6 +149,10 @@ Recall families are related with complexity
 
 *  OWL DL
 
+rdf:Property
+- owl:ObjectProperty (relation between instances of classes).
+- owl:DatatypeProperty (relation between instance of class and RDF literals).
+
 - subClassOf: C \subseteq D
 - equivalentClass: C \equiv D
 - disjointWith: C \subseteq \neg D
