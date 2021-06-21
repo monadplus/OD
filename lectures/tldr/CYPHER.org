@@ -72,14 +72,24 @@ WHERE
   AND b.name = 'Daniel'
   AND all(x IN nodes(p) WHERE x.age > 30)
 RETURN p
+
+MATCH (n)
+WHERE exists(n.name)
+RETURN
+  n.name AS name,
+  exists((n)-[:MARRIED]->()) AS is_married
 #+end_src
 
 ** Aggregate functions
 
 #+begin_src c
 MATCH (n:Person)
-RETURN avg(n.age)
+RETURN n, count(*)
+#+end_src
 
+The first, n, is not an aggregate function, so it will be the grouping key. The latter, count(*) is an aggregate expression. The matching paths will be divided into different buckets, depending on the grouping key.
+
+#+begin_src c
 MATCH (n {name: 'A'})-->(x)
 RETURN labels(n), n.age, count(*)
 
